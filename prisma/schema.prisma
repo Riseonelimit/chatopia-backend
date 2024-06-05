@@ -1,0 +1,113 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Profile     Profile?
+  chats       Chat[]
+  sender      Message[] @relation("sender")
+  receiver    Message[] @relation("receiver")
+  requestedBy Invite[]  @relation("requestedBy")
+  requestedTo Invite[]  @relation("requestedTo")
+  userId      Friend[]  @relation("user")
+  friendId    Friend[]  @relation("friend")
+
+  @@map("user")
+}
+
+model Profile {
+  id    String    @id @default(uuid())
+  about String
+  image String
+  theme ThemeType
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+
+  @@map("profile")
+}
+
+model Friend {
+  id        String   @id @default(uuid())
+  userId    String
+  friendId  String
+  createdAt DateTime @default(now())
+  user      User     @relation("user", fields: [userId], references: [id])
+  friend    User     @relation("friend", fields: [friendId], references: [id])
+
+  @@map("friends")
+}
+
+model Chat {
+  id            String   @id @default(uuid())
+  isGroup       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastMessageId String
+
+  participants User[]
+  chatIcon     String?
+  groupName    String?
+  lastMessage  Message @relation(fields: [lastMessageId], references: [id])
+
+  @@map("chat")
+}
+
+model Message {
+  id          String      @id @default(uuid())
+  content     String
+  senderId    String
+  receiverId  String
+  isDelivered Boolean     @default(false)
+  isSeen      Boolean     @default(false)
+  isDeleted   Boolean     @default(false)
+  creadtedAt  DateTime    @default(now())
+  type        MessageType @default(TEXT)
+
+  sender   User   @relation("sender", fields: [senderId], references: [id])
+  receiver User   @relation("receiver", fields: [receiverId], references: [id])
+  Chat     Chat[]
+
+  @@map("message")
+}
+
+model Invite {
+  id            Int        @id @default(autoincrement())
+  requestedById String
+  requestToId   String
+  chatId        String
+  type          InviteType
+
+  requestTo   User @relation("requestedTo", fields: [requestToId], references: [id])
+  requestedBy User @relation("requestedBy", fields: [requestedById], references: [id])
+
+  @@map("invite")
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+}
+
+enum InviteType {
+  FRIEND
+  GROUP
+}
+
+enum ThemeType {
+  LIGHT
+  DARK
+  SYSTEM
+}
