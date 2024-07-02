@@ -55,29 +55,32 @@ model Chat {
   isGroup       Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  lastMessageId String
+  lastMessageId String?
 
   participants User[]
   chatIcon     String?
   groupName    String?
-  lastMessage  Message @relation(fields: [lastMessageId], references: [id])
+  lastMessage  Message?  @relation(fields: [lastMessageId], references: [id])
+  Message      Message[] @relation("chatId")
 
   @@map("chat")
 }
 
 model Message {
-  id          String      @id @default(uuid())
-  content     String
-  senderId    String
-  receiverId  String
-  isDelivered Boolean     @default(false)
-  isSeen      Boolean     @default(false)
-  isDeleted   Boolean     @default(false)
-  creadtedAt  DateTime    @default(now())
-  type        MessageType @default(TEXT)
+  id         String      @id @default(uuid())
+  content    String
+  chatId     String
+  senderId   String
+  receiverId String
+  isGroup    Boolean     @default(false)
+  isSeen     Boolean     @default(false)
+  isDeleted  Boolean     @default(false)
+  creadtedAt DateTime    @default(now())
+  type       MessageType @default(TEXT)
 
   sender   User   @relation("sender", fields: [senderId], references: [id])
   receiver User   @relation("receiver", fields: [receiverId], references: [id])
+  chat     Chat   @relation("chatId", fields: [chatId], references: [id])
   Chat     Chat[]
 
   @@map("message")
