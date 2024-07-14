@@ -1,60 +1,60 @@
 import { Request, Response } from "express";
 import prisma from "../../db/prisma.client";
-import apiResponse from "../utils/apiResponse";
+import ApiResponse from "../utils/ApiResponse";
+import UserRepository from "../../db/repository/UserRepository";
+import ApiError from "../utils/ApiError";
+import { ApiErrorInterface } from "../types";
 
 export const addUser = async (req: Request, res: Response) => {
-    const userData = req.body;
-    console.log("UserData", userData);
-    
-    if (!userData) {
+    try {
+        const userData = req.body;
+
+        if (!userData) {
+            return res
+                .status(400)
+                .json(
+                    new ApiResponse(
+                        400,
+                        { success: false },
+                        "No Data Found to insert"
+                    )
+                );
+        }
+        const result = await UserRepository.addUser(userData);
+        if (!result) {
+            throw new ApiError(404, "");
+        }
+        if (result) {
+            return res
+                .status(201)
+                .json(
+                    new ApiResponse(
+                        201,
+                        { result: userData },
+                        "User Created Successfully"
+                    )
+                );
+        }
+
         return res
             .status(400)
             .json(
-                new apiResponse(
-                    400,
-                    { success: false },
-                    "No Data Found to insert"
-                )
+                new ApiResponse(400, { success: false }, "Something Went Wrong")
             );
+    } catch (error) {
+        if (error instanceof ApiError) {
+            return res
+                .status(error.statusCode)
+                .json(
+                    new ApiResponse(
+                        error.statusCode,
+                        { success: false },
+                        error.message
+                    )
+                );
+        }
     }
-    const result = await prisma.user.create({
-        data: {
-            email: userData.email,
-            name: userData.name,
-            Profile: {
-                create: {
-                    image: userData.image || "",
-                    about: "",
-                    theme: "LIGHT",
-                },
-            },
-        },
-    });
-    if (result) {
-        const userProfile = await prisma.profile.findFirst({
-            where: {
-                userId: result.id,
-            },
-        });
-        console.log(userProfile);
-
-        return res
-            .status(201)
-            .json(
-                new apiResponse(
-                    201,
-                    { result: userData, userProfile },
-                    "User Created Successfully"
-                )
-            );
-    }
-
-    return res
-        .status(400)
-        .json(new apiResponse(400, { success: false }, "Something Went Wrong"));
 };
-
-
 
 // MISC
 
@@ -106,7 +106,6 @@ const chatMessage = async () => {
             participants: true,
         },
     });
-    console.log(groupMembers[0].participants);
 };
 
 // chatMessage();

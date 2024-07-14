@@ -1,4 +1,4 @@
-class apiResponse {
+class ApiResponse {
     status: number;
     data: any;
     message: string;
@@ -12,5 +12,5 @@ class apiResponse {
 }
 //Provides a convenient way to create consistent and structured API responses
 
-export default apiResponse;
+export default ApiResponse;
 //Export ApiResponse Class
