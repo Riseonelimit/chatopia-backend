@@ -3,6 +3,7 @@ import { io } from "..";
 import { userEvents } from "./user";
 import { OnlineUsersSet } from "../types";
 import { chatEvents } from "./chat";
+import { friendEvents } from "./friend";
 
 let onlineUsers: OnlineUsersSet = new Set();
 
@@ -16,12 +17,12 @@ export const createSocketConnection = () => {
 
         //adding the user in onlineList
         onlineUsers.add(socket.handshake.query.uuid);
-
         //-----EVENTS------
 
         userEvents(socket, onlineUsers);
 
-        chatEvents(socket);
+        chatEvents(socket, uid);
+        friendEvents(socket, uid);
 
         // -----0N-DISCONNECT-------
         socket.on("disconnect", (reason) => {

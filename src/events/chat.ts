@@ -3,7 +3,7 @@ import MessageRepository from "../../db/repository/MessageRepository";
 import { ChatMessage } from "../types";
 import DBError from "../utils/DBError";
 
-export const chatEvents = (socket: Socket) => {
+export const chatEvents = (socket: Socket, uid: string) => {
     socket.on(
         `chat:send-message:${socket.handshake.query.uuid}`,
         async (message: ChatMessage) => {
