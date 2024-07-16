@@ -11,9 +11,10 @@ class MessageRepository {
 
     async addMessage(message: ChatMessage) {
         try {
+            
             const response = await prisma.message.create({
                 data: {
-                    chatId: "48c5df18-e5c9-4b1c-a989-80049bbacccb",
+                    chatId: message.chatId,
                     senderId: message.senderId,
                     receiverId: message.receiverId,
                     content: message.content,
@@ -41,16 +42,20 @@ class MessageRepository {
             throw error;
         }
     }
-    async getChatMessages(chatId: string) {
+    async getAllMessagesByChatId(chatId: string) {
         try {
+            console.log(chatId);
+
             const chatMessages = await prisma.message.findMany({
                 where: {
                     chatId: chatId,
                 },
             });
+            console.log(chatMessages);
+
             return chatMessages;
         } catch (error) {
-            console.error("Error adding message:", error);
+            console.error("No messages Found:", error);
             throw error;
         }
     }

@@ -46,3 +46,11 @@ export interface ApiErrorInterface {
     data: string | JSON;
     errors: any[];
 }
+
+
+export type NewChatData = {
+    currentUser: User;
+    userDetails: Pick<User, "name" | "id"> & {
+        Profile: Pick<Profile, "image">;
+    };
+};

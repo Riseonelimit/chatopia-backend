@@ -22,23 +22,31 @@ export const authUser = async (req: Request, res: Response) => {
 
         const result = await UserRepository.getUserByEmail(email);
         // NON ACCURATE METHOD -- NEEDS A FIX LATER AND DB UPDATE
-        const friendList = await prisma.user.findMany({
+        const userChats = await prisma.chat.findMany({
             where: {
-                friendId: {
-                    every: {
-                        userId: result?.id,
+                participants: {
+                    some: {
+                        id: result?.id,
                     },
-                },
-                email: {
-                    not: result?.email,
                 },
             },
             include: {
-                Profile: {},
+                participants: {
+                    select: {
+                        id: true,
+                        email: true,
+                        name: true,
+                        Profile: {
+                            select: {
+                                image: true,
+                            },
+                        },
+                    },
+                },
             },
         });
 
-        // console.log(friendList);
+        // console.log(userChats);
         if (!result) {
             throw new ApiError(404, "Not Found");
         }
@@ -47,16 +55,21 @@ export const authUser = async (req: Request, res: Response) => {
             .json(
                 new ApiResponse(
                     200,
-                    { userInfo: result, friendList },
+                    { userInfo: result, userChats },
                     "Record Found"
                 )
             );
     } catch (error) {
-        if (error instanceof ApiError)
+        if (error instanceof ApiError) {
             return res
                 .status(error.statusCode)
                 .json(
                     new ApiResponse(error.statusCode, error.data, error.message)
                 );
+        }
+
+        return res
+            .status(500)
+            .json(new ApiResponse(500, error, "Something Went Wrong"));
     }
 };

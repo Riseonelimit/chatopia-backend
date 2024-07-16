@@ -56,10 +56,10 @@ model Chat {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   lastMessageId String?
+  groupName     String?
+  chatIcon      String?
 
   participants User[]
-  chatIcon     String?
-  groupName    String?
   lastMessage  Message?  @relation(fields: [lastMessageId], references: [id])
   Message      Message[] @relation("chatId")
 

@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import prisma from "../prisma.client";
 import { THEME, User } from "../../src/types";
+import ApiError from "../../src/utils/ApiError";
 
 class UserRepository {
     private prisma: PrismaClient;
@@ -64,7 +65,7 @@ class UserRepository {
             return user;
         } catch (error) {
             console.error("Error retrieving user:", error);
-            throw error;
+            throw new ApiError(404, "Error retrieving user");
         }
     }
 

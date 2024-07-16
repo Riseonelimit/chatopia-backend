@@ -1,7 +1,8 @@
 import cors from "cors";
 import express, { json, urlencoded } from "express";
 import { createServer } from "http";
-import router from "../routes/auth.routes";
+import { authRouter } from "../routes/auth.routes";
+import { chatRouter } from "../routes/chat.routes";
 import { userRouter } from "../routes/user.routes";
 
 export const app = express();
@@ -18,5 +19,6 @@ app.use(
 );
 
 //--------routes-----------
-app.use("/api/v1", router);
+app.use("/api/v1", authRouter);
+app.use("/api/v1", chatRouter);
 app.use("/api/v1/user", userRouter);

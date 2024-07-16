@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import prisma from "../../db/prisma.client";
-import ApiResponse from "../utils/ApiResponse";
 import UserRepository from "../../db/repository/UserRepository";
 import ApiError from "../utils/ApiError";
-import { ApiErrorInterface } from "../types";
+import ApiResponse from "../utils/ApiResponse";
 
 export const addUser = async (req: Request, res: Response) => {
     try {
@@ -89,17 +88,17 @@ const chatMessage = async () => {
 
     console.log(user1);
 
-    // const res = await prisma.chat.create({
-    //     data: {
-    //         groupName: "Test",
-    //         isGroup: false,
-    //         chatIcon: user1?.name,
-    //         lastMessageId: null,
-    //         participants: {
-    //             connect: [{ id: user1?.id }],
-    //         },
-    //     },
-    // });
+    const res = await prisma.chat.create({
+        data: {
+            groupName: "Test",
+            isGroup: false,
+            chatIcon: user1?.name,
+            lastMessageId: null,
+            participants: {
+                connect: [{ id: user1?.id }],
+            },
+        },
+    });
 
     const groupMembers = await prisma.chat.findMany({
         include: {
