@@ -75,7 +75,8 @@ model Message {
   isGroup    Boolean     @default(false)
   isSeen     Boolean     @default(false)
   isDeleted  Boolean     @default(false)
-  creadtedAt DateTime    @default(now())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @default(now())
   type       MessageType @default(TEXT)
 
   sender   User   @relation("sender", fields: [senderId], references: [id])
@@ -110,7 +111,9 @@ enum InviteType {
 }
 
 enum ThemeType {
-  LIGHT
-  DARK
-  SYSTEM
+    DEFAULT
+    EMERALD
+    PINK
+    MOCHA
+    DARK
 }

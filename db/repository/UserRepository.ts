@@ -1,7 +1,7 @@
-import { PrismaClient } from "@prisma/client";
-import prisma from "../prisma.client";
-import { THEME, User } from "../../src/types";
+import { PrismaClient, ThemeType } from "@prisma/client";
+import { User } from "../../src/types";
 import ApiError from "../../src/utils/ApiError";
+import prisma from "../prisma.client";
 
 class UserRepository {
     private prisma: PrismaClient;
@@ -20,10 +20,7 @@ class UserRepository {
                         create: {
                             image: userData.Profile?.image || "",
                             about: "",
-                            theme:
-                                userData.Profile.theme == THEME.LIGHT
-                                    ? "LIGHT"
-                                    : "DARK",
+                            theme: userData.Profile.theme,
                         },
                     },
                 },

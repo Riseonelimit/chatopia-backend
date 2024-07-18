@@ -1,3 +1,5 @@
+import { ThemeType } from "@prisma/client";
+
 export type OnlineUsersSet = Set<string | string[] | undefined>;
 
 export type ChatMessage = {
@@ -10,6 +12,8 @@ export type ChatMessage = {
     type: MessageType;
     content: string;
     isGroup: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 };
 
 export enum MessageType {
@@ -31,13 +35,16 @@ export interface Profile {
     id: string;
     about: string;
     image: string;
-    theme: THEME;
+    theme: ThemeType;
 }
 export enum THEME {
-    LIGHT,
+    DEFAULT,
+    EMERALD,
+    PINK,
+    MOCHA,
     DARK,
-    SYSTEM,
 }
+
 export interface ApiErrorInterface {
     statusCode: number;
     message: string;
@@ -46,7 +53,6 @@ export interface ApiErrorInterface {
     data: string | JSON;
     errors: any[];
 }
-
 
 export type NewChatData = {
     currentUser: User;
