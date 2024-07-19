@@ -8,9 +8,6 @@ export const friendEvents = (socket: Socket, uid: string) => {
         `chat:find-user:${uid}`,
         async ({ id, searchName }: { id: string; searchName: string }) => {
             try {
-                console.log("here");
-                console.log(id);
-
                 const result = await prisma.user.findMany({
                     where: {
                         name: { contains: searchName },

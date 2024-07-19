@@ -1,5 +1,5 @@
 import { PrismaClient, ThemeType } from "@prisma/client";
-import { User } from "../../src/types";
+import { THEME, User } from "../../src/types";
 import ApiError from "../../src/utils/ApiError";
 import prisma from "../prisma.client";
 
@@ -86,6 +86,21 @@ class UserRepository {
             });
         } catch (error) {
             console.error("Error deleting user:", error);
+            throw error;
+        }
+    }
+    async setTheme(theme: ThemeType, userId: string) {
+        try {
+            await this.prisma.profile.update({
+                where: {
+                    userId,
+                },
+                data: {
+                    theme: theme as ThemeType,
+                },
+            });
+        } catch (error) {
+            console.error("Error setting theme:", error);
             throw error;
         }
     }

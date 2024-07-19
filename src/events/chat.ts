@@ -4,30 +4,25 @@ import { ChatMessage } from "../types";
 import DBError from "../utils/DBError";
 
 export const chatEvents = (socket: Socket, uid: string) => {
-    socket.on(
-        `chat:send-message:${socket.handshake.query.uuid}`,
-        async (message: ChatMessage) => {
-            try {
-                const result = await MessageRepository.addMessage(message);
-                if (!result) {
-                    throw new DBError(
-                        `Failed to add Message for User: ${socket.handshake.query.uuid}`
+    socket.on(`chat:send-message:${uid}`, async (message: ChatMessage) => {
+        try {
+            const result = await MessageRepository.addMessage(message);
+            if (!result) {
+                throw new DBError(`Failed to add Message for User: ${uid}`);
+            }
+            if (result)
+                socket.broadcast
+                    .to(message.receiverId)
+                    .emit(
+                        `chat:receive-message:${message.receiverId}`,
+                        message
                     );
-                }
-                if (result)
-                    socket.broadcast
-                        .to(message.receiverId)
-                        .emit(
-                            `chat:receive-message:${message.receiverId}`,
-                            message
-                        );
-            } catch (error) {
-                if (error instanceof DBError) {
-                    console.error(error.message);
-                }
+        } catch (error) {
+            if (error instanceof DBError) {
+                console.error(error.message);
             }
         }
-    );
+    });
     socket.on("chat:get-messages", async (chatId: string) => {
         try {
             console.log(chatId);
@@ -36,9 +31,7 @@ export const chatEvents = (socket: Socket, uid: string) => {
                 chatId
             );
             if (!messages) {
-                throw new DBError(
-                    `Failed to add Message for User: ${socket.handshake.query.uuid}`
-                );
+                throw new DBError(`Failed to add Message for User: ${uid}`);
             }
             console.log(messages);
 
