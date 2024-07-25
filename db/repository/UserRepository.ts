@@ -89,6 +89,7 @@ class UserRepository {
             throw error;
         }
     }
+
     async setTheme(theme: ThemeType, userId: string) {
         try {
             await this.prisma.profile.update({
@@ -101,6 +102,19 @@ class UserRepository {
             });
         } catch (error) {
             console.error("Error setting theme:", error);
+            throw error;
+        }
+    }
+    async addFriend(userId: string, friendId: string) {
+        try {
+            await this.prisma.friend.create({
+                data: {
+                    userId,
+                    friendId,
+                },
+            });
+        } catch (error) {
+            console.error("Error adding friend:", error);
             throw error;
         }
     }

@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { NewChatData } from "../../src/types";
+import { NewChatData, NewGroup, User } from "../../src/types";
 import prisma from "../prisma.client";
 import ApiError from "../../src/utils/ApiError";
+import DBError from "../../src/utils/DBError";
 
 class ChatRepository {
     private prisma: PrismaClient;
@@ -62,6 +63,34 @@ class ChatRepository {
             },
         });
         return newChat;
+    }
+
+    async createGroup({
+        groupDetails,
+        participantArray,
+    }: {
+        groupDetails: NewGroup;
+        participantArray: Array<Pick<User, "id">>;
+    }) {
+        try {
+            const result = await prisma.chat.create({
+                data: {
+                    chatIcon: groupDetails.chatIcon,
+                    groupName: groupDetails.groupName,
+                    isGroup: true,
+                    participants: {
+                        connect: [...participantArray],
+                    },
+                },
+                include: {
+                    participants: true,
+                },
+            });
+
+            if (!result) throw new DBError("Unable to Create Group");
+
+            if (result) return result;
+        } catch (error) {}
     }
 }
 

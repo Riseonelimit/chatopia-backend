@@ -44,11 +44,21 @@ class MessageRepository {
     }
     async getAllMessagesByChatId(chatId: string) {
         try {
-            console.log(chatId);
-
             const chatMessages = await prisma.message.findMany({
                 where: {
                     chatId: chatId,
+                },
+                include: {
+                    sender: {
+                        select: {
+                            name: true,
+                            Profile: {
+                                select: {
+                                    image: true,
+                                },
+                            },
+                        },
+                    },
                 },
             });
             console.log(chatMessages);

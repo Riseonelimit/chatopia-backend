@@ -1,4 +1,4 @@
-import { ThemeType } from "@prisma/client";
+import { Chat, ThemeType } from "@prisma/client";
 
 export type OnlineUsersSet = Set<string | string[] | undefined>;
 
@@ -60,3 +60,5 @@ export type NewChatData = {
         Profile: Pick<Profile, "image">;
     };
 };
+
+export type NewGroup = Pick<Chat, "groupName" | "chatIcon" | "isGroup">;

@@ -20,13 +20,13 @@ export const authUser = async (req: Request, res: Response) => {
                 );
         }
 
-        const result = await UserRepository.getUserByEmail(email);
+        const user = await UserRepository.getUserByEmail(email);
         // NON ACCURATE METHOD -- NEEDS A FIX LATER AND DB UPDATE
         const userChats = await prisma.chat.findMany({
             where: {
                 participants: {
                     some: {
-                        id: result?.id,
+                        id: user?.id,
                     },
                 },
             },
@@ -46,8 +46,20 @@ export const authUser = async (req: Request, res: Response) => {
             },
         });
 
-        // console.log(userChats);
-        if (!result) {
+        const userFriends = await prisma.friend.findMany({
+            where: {
+                userId: user?.id,
+            },
+            select: {
+                friend: {
+                    include: {
+                        Profile: {},
+                    },
+                },
+            },
+        });
+        console.log(userFriends);
+        if (!user) {
             throw new ApiError(404, "Not Found");
         }
         return res
@@ -55,7 +67,7 @@ export const authUser = async (req: Request, res: Response) => {
             .json(
                 new ApiResponse(
                     200,
-                    { userInfo: result, userChats },
+                    { userInfo: user, userChats, userFriends },
                     "Record Found"
                 )
             );

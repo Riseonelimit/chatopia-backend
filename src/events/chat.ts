@@ -4,7 +4,7 @@ import { ChatMessage } from "../types";
 import DBError from "../utils/DBError";
 
 export const chatEvents = (socket: Socket, uid: string) => {
-    socket.on(`chat:send-message:${uid}`, async (message: ChatMessage) => {
+    socket.on(`chat:send-message`, async (message: ChatMessage) => {
         try {
             const result = await MessageRepository.addMessage(message);
             if (!result) {
@@ -25,15 +25,12 @@ export const chatEvents = (socket: Socket, uid: string) => {
     });
     socket.on("chat:get-messages", async (chatId: string) => {
         try {
-            console.log(chatId);
-
             const messages = await MessageRepository.getAllMessagesByChatId(
                 chatId
             );
             if (!messages) {
                 throw new DBError(`Failed to add Message for User: ${uid}`);
             }
-            console.log(messages);
 
             if (messages) socket.emit(`chat:get-all-messages`, messages);
         } catch (error) {
@@ -41,6 +38,10 @@ export const chatEvents = (socket: Socket, uid: string) => {
                 console.error(error.message);
             }
         }
+    });
+    socket.on(`chat:typing`, ({ chatId, receiverId, isTyping }) => {
+        console.log(receiverId);
+        socket.to(receiverId).emit(`chat:typing-true`, { chatId, isTyping });
     });
 };
 

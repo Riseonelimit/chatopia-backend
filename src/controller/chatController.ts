@@ -1,11 +1,13 @@
 import ChatRepository from "../../db/repository/ChatRepository";
+import UserRepository from "../../db/repository/UserRepository";
+import { NewChatData } from "../types";
 import ApiError from "../utils/ApiError";
 import ApiResponse from "../utils/ApiResponse";
 import { Request, Response } from "express";
 
 export const createNewChat = async (req: Request, res: Response) => {
     try {
-        const chatData = req.body;
+        const chatData: NewChatData = req.body;
         console.log(chatData);
 
         if (!chatData) {
@@ -19,7 +21,17 @@ export const createNewChat = async (req: Request, res: Response) => {
                     )
                 );
         }
+
         const result = await ChatRepository.createChat(chatData);
+        const friendResult = await UserRepository.addFriend(
+            chatData.currentUser.id,
+            chatData.userDetails.id
+        );
+        await UserRepository.addFriend(
+            chatData.userDetails.id,
+            chatData.currentUser.id
+        );
+
         if (!result) {
             throw new ApiError(404, "");
         }
