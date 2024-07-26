@@ -1,6 +1,20 @@
-import { Chat, ThemeType } from "@prisma/client";
+import { ThemeType } from "@prisma/client";
 
 export type OnlineUsersSet = Set<string | string[] | undefined>;
+
+export interface Chat {
+    id: string;
+    isGroup: boolean;
+    groupName: string;
+    chatIcon: string;
+    lastMessageId?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    isTyping?: boolean | false;
+    participants: Omit<User[], "createdAt" | "updatedAt" | "Profile"> & {
+        Profile: Pick<Profile, "image">;
+    };
+}
 
 export type ChatMessage = {
     id?: string;
